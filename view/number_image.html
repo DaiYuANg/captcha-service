@@ -1,0 +1,25 @@
+{{define "content"}}
+<body class="bg-gray-100">
+<div class="max-w-xl mx-auto mt-12 bg-white p-6 rounded-lg shadow">
+  <h1 class="text-2xl font-bold text-center mb-4">{{.Title}}</h1>
+
+  <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" onclick="refreshCaptcha()">刷新验证码
+  </button>
+
+  <div class="text-center">
+    <img id="captcha" class="inline-block border border-gray-300 img-thumbnail" src=""
+         alt="验证码">
+  </div>
+</div>
+</body>
+
+<script>
+  const refreshCaptcha = async () => {
+    const res = await fetch('/image/generate/number');
+    const data = await res.json();
+    document.getElementById('captcha').src = data.data;
+  };
+
+  window.onload = refreshCaptcha;
+</script>
+{{end}}

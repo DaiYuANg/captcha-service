@@ -1,0 +1,113 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  BIN_NAME: captcha-service
+  DIST_DIR: dist
+  # 默认平台
+  DEFAULT_GOOS: linux
+  DEFAULT_GOARCH: amd64
+  DOCKERHUB_REPO: daiyuang/captcha-service
+  CONTAINER_PLATFORM: linux/amd64,linux/arm64
+tasks:
+  clean:
+    cmds:
+      - rm -rf {{.DIST_DIR}}
+
+  build:
+    desc: 构建当前平台（默认启用 CGO）
+    cmds:
+      - go build -o {{.DIST_DIR}}/{{.BIN_NAME}} .
+
+  build:all:
+    desc: 构建所有平台（含 CGO）
+    deps: [ build:linux, build:darwin, build:windows ]
+
+  build:linux:
+    desc: 构建 Linux 版本（带 CGO）
+    deps: [ clean ]
+    env:
+      GOOS: linux
+      GOARCH: amd64
+    cmds:
+      - mkdir -p {{.DIST_DIR}}/linux
+      - go build -trimpath -ldflags="-s -w" -o {{.DIST_DIR}}/linux/{{.BIN_NAME}} .
+
+  build:darwin:
+    desc: 构建 macOS 版本（带 CGO）
+    env:
+      GOOS: darwin
+      GOARCH: amd64
+    cmds:
+      - mkdir -p {{.DIST_DIR}}/darwin
+      - go build -trimpath -ldflags="-s -w" -o {{.DIST_DIR}}/darwin/{{.BIN_NAME}} .
+    deps: [ clean ]
+
+
+  build:windows:
+    desc: 构建 Windows 版本（带 CGO）
+    deps: [ clean ]
+    env:
+      GOOS: windows
+      GOARCH: amd64
+    cmds:
+      - mkdir -p {{.DIST_DIR}}/windows
+      - go build -trimpath -ldflags="-s -w" -o {{.DIST_DIR}}/windows/{{.BIN_NAME}}.exe .
+
+  build:docker:distroless:
+    desc: 构建 Docker 镜像并推送到 DockerHub 和 GHCR（distroless）
+    cmds:
+      - |
+        docker buildx build \
+          --target distroless \
+          --platform {{.CONTAINER_PLATFORM}} \
+          -t {{.DOCKERHUB_REPO}}:distroless \
+          -t {{.DOCKERHUB_REPO}}:latest \
+          --push \
+          .
+
+  build:docker:alpine:
+    desc: 构建 Alpine 运行时镜像
+    cmds:
+      - |
+        docker buildx build \
+          --target alpine \
+          --platform {{.CONTAINER_PLATFORM}} \
+          -t {{.DOCKERHUB_REPO}}:alpine \
+          --push \
+          .
+
+  build:docker:debian:
+    desc: 构建 Debian Slim 运行时镜像
+    cmds:
+      - |
+        docker buildx build \
+          --target debian \
+          --platform {{.CONTAINER_PLATFORM}} \
+          -t {{.DOCKERHUB_REPO}}:debian \
+          --push \
+          .
+
+  build:docker:scratch:
+    desc: 构建 Scratch 运行时镜像
+    cmds:
+      - |
+        docker buildx build \
+          --target scratch \
+          --platform {{.CONTAINER_PLATFORM}} \
+          -t {{.DOCKERHUB_REPO}}:scratch \
+          --push \
+          .
+
+  build:docker:
+    desc: build container
+    deps: [ build:docker:scratch,build:docker:distroless,build:docker:alpine,build:docker:debian ]
+
+  check:
+    cmds:
+      - go tool staticcheck ./...
+
+  lint:
+    cmds:
+      - go tool golangci-lint run
