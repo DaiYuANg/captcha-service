@@ -5,17 +5,17 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-type ImageCaptchaController struct {
+type CaptchaController struct {
 	store *cache.Cache[[]byte]
 }
 
-func NewCaptchaController(store *cache.Cache[[]byte]) *ImageCaptchaController {
-	return &ImageCaptchaController{
+func NewCaptchaController(store *cache.Cache[[]byte]) *CaptchaController {
+	return &CaptchaController{
 		store: store,
 	}
 }
 
-func (i *ImageCaptchaController) RegisterRoute(app *fiber.App) {
+func (i *CaptchaController) RegisterRoute(app *fiber.App) {
 	group := app.Group("image")
 	generate := group.Group("/generate")
 	verify := group.Group("verify")

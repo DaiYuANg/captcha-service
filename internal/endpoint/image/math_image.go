@@ -8,7 +8,7 @@ import (
 	"image/color"
 )
 
-func (i *ImageCaptchaController) mathImage(ctx fiber.Ctx) error {
+func (i *CaptchaController) mathImage(ctx fiber.Ctx) error {
 	base64Driver := driver.NewDriverMath(driver.DriverMath{
 		Width:           240,                                 // 宽度
 		Height:          60,                                  // 高度

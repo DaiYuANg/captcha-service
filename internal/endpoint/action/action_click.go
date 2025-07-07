@@ -8,7 +8,7 @@ import (
 	"github.com/wenlng/go-captcha/v2/click"
 )
 
-func (action *ActionCaptchaController) click(ctx fiber.Ctx) error {
+func (action *CaptchaController) click(ctx fiber.Ctx) error {
 	builder := click.NewBuilder(
 		click.WithRangeLen(option.RangeVal{Min: 4, Max: 6}),
 		click.WithRangeVerifyLen(option.RangeVal{Min: 2, Max: 4}),
@@ -26,8 +26,8 @@ func (action *ActionCaptchaController) click(ctx fiber.Ctx) error {
 	}
 
 	builder.SetResources(
-		click.WithChars(chars),                         // 每次变化
-		click.WithFonts([]*truetype.Font{action.font}), // 静态
+		click.WithChars(chars),
+		click.WithFonts([]*truetype.Font{action.font}),
 		click.WithBackgrounds(action.bgImage),
 	)
 

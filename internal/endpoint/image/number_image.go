@@ -11,7 +11,7 @@ import (
 	"strconv"
 )
 
-func (i *ImageCaptchaController) numberImage(ctx fiber.Ctx) error {
+func (i *CaptchaController) numberImage(ctx fiber.Ctx) error {
 	ctx.Query("width", "240")
 	base64Driver := driver.NewDriverDigit(driver.DriverDigit{
 		Width:      240,
@@ -50,6 +50,11 @@ func (i *ImageCaptchaController) numberImage(ctx fiber.Ctx) error {
 	})
 }
 
-func (i *ImageCaptchaController) verifyNumber(ctx fiber.Ctx) error {
+type VerifyData struct {
+	ID    string
+	Input string
+}
+
+func (i *CaptchaController) verifyNumber(ctx fiber.Ctx) error {
 	return nil
 }

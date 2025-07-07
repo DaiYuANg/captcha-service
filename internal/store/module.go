@@ -31,12 +31,11 @@ func newStoreCore(config *config.Config, ctx context.Context, logger *zap.Sugare
 		bigcacheClient, _ := bigcache.New(ctx, bigcache.DefaultConfig(2*time.Minute))
 		backend = bigcachestore.NewBigcache(bigcacheClient)
 	case constant.Redis:
-		redisClient := redis.NewClient(&redis.Options{
+		redisClient, err := newRedisClient(ctx, &redis.Options{
 			Addr: config.Store.Url,
 		})
-		ping := redisClient.Ping(ctx)
-		if ping.Err() != nil {
-			return nil, ping.Err()
+		if err != nil {
+			return nil, err
 		}
 		backend = redisstore.NewRedis(
 			redisClient,

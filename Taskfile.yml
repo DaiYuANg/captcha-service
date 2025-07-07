@@ -9,7 +9,7 @@ vars:
   DEFAULT_GOOS: linux
   DEFAULT_GOARCH: amd64
   DOCKERHUB_REPO: daiyuang/captcha-service
-  CONTAINER_PLATFORM: linux/amd64,linux/arm64
+  CONTAINER_PLATFORM: linux/amd64
 tasks:
   clean:
     cmds:
@@ -64,7 +64,6 @@ tasks:
           --platform {{.CONTAINER_PLATFORM}} \
           -t {{.DOCKERHUB_REPO}}:distroless \
           -t {{.DOCKERHUB_REPO}}:latest \
-          --push \
           .
 
   build:docker:alpine:
@@ -75,7 +74,6 @@ tasks:
           --target alpine \
           --platform {{.CONTAINER_PLATFORM}} \
           -t {{.DOCKERHUB_REPO}}:alpine \
-          --push \
           .
 
   build:docker:debian:
@@ -86,7 +84,6 @@ tasks:
           --target debian \
           --platform {{.CONTAINER_PLATFORM}} \
           -t {{.DOCKERHUB_REPO}}:debian \
-          --push \
           .
 
   build:docker:scratch:
@@ -97,7 +94,6 @@ tasks:
           --target scratch \
           --platform {{.CONTAINER_PLATFORM}} \
           -t {{.DOCKERHUB_REPO}}:scratch \
-          --push \
           .
 
   build:docker:

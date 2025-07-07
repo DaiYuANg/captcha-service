@@ -7,7 +7,7 @@ import (
 	"github.com/golang-module/base64Captcha/store"
 )
 
-func (i *ImageCaptchaController) wordImage(ctx fiber.Ctx) error {
+func (i *CaptchaController) wordImage(ctx fiber.Ctx) error {
 	base64Driver := driver.DefaultDriverLetter
 
 	captcha := base64Captcha.NewCaptcha(base64Driver, store.DefaultStoreMemory)

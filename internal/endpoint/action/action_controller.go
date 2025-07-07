@@ -8,18 +8,18 @@ import (
 	"image"
 )
 
-type ActionCaptchaController struct {
+type CaptchaController struct {
 	font    *truetype.Font
 	bgImage []image.Image
 }
 
-func (action *ActionCaptchaController) RegisterRoute(app *fiber.App) {
+func (action *CaptchaController) RegisterRoute(app *fiber.App) {
 	group := app.Group("/action")
 	group.Get("/click", action.click)
 	group.Get("/drag/drop", action.dragDrop)
 }
 
-func NewActionController() *ActionCaptchaController {
+func NewActionController() *CaptchaController {
 	font, err := fzshengsksjw.GetFont()
 	if err != nil {
 		panic(err)
@@ -28,7 +28,7 @@ func NewActionController() *ActionCaptchaController {
 	if err != nil {
 		panic(err)
 	}
-	return &ActionCaptchaController{
+	return &CaptchaController{
 		font:    font,
 		bgImage: images,
 	}

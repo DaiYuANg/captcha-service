@@ -33,7 +33,7 @@ type Store struct {
 func defaultConfig() Config {
 	return Config{
 		Http: Http{
-			Port:    80,
+			Port:    18080,
 			Prefork: true,
 		},
 		Store: Store{Type: constant.Memory},
