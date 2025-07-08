@@ -2,8 +2,6 @@ package image
 
 import (
 	"captcha-service/internal/model"
-	"context"
-	"encoding/json"
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/gofiber/fiber/v3"
 	"github.com/golang-module/base64Captcha/driver"
@@ -28,12 +26,8 @@ func (i *CaptchaController) numberImage(ctx fiber.Ctx) error {
 		Content: content,
 		Answer:  s,
 	}
-	marshal, err := json.Marshal(cache)
-	if err != nil {
-		return err
-	}
 
-	err = i.store.Set(context.Background(), id, marshal)
+	err := i.store.Set(id, &cache)
 	if err != nil {
 		return err
 	}
@@ -51,10 +45,32 @@ func (i *CaptchaController) numberImage(ctx fiber.Ctx) error {
 }
 
 type VerifyData struct {
-	ID    string
-	Input string
+	ID    string `json:"id"`
+	Input string `json:"input"`
 }
 
 func (i *CaptchaController) verifyNumber(ctx fiber.Ctx) error {
-	return nil
+	// 解析请求体
+	var data VerifyData
+	if err := ctx.Bind().Body(&data); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "请求参数错误")
+	}
+
+	// 从 store 取验证码数据
+	cache, err := i.store.Get(data.ID)
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "验证码不存在或已过期")
+	}
+
+	if data.Input == "" || data.Input != cache.Answer {
+		return fiber.NewError(fiber.StatusBadRequest, "验证码错误")
+	}
+
+	// 验证通过后，删除缓存，防止重复使用
+	_ = i.store.Delete(data.ID)
+
+	// 返回成功响应
+	return model.OK(ctx, fiber.Map{
+		"success": true,
+	})
 }

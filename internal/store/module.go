@@ -19,7 +19,6 @@ var Module = fx.Module("store",
 	fx.Provide(
 		storeContext,
 		newStoreCore,
-		newStore,
 	),
 )
 
@@ -28,11 +27,18 @@ func newStoreCore(config *config.Config, ctx context.Context, logger *zap.Sugare
 	logger.Debugf("current backend %s", config.Store.Type)
 	switch config.Store.Type {
 	case constant.Memory:
-		bigcacheClient, _ := bigcache.New(ctx, bigcache.DefaultConfig(2*time.Minute))
+		bgConf := bigcache.DefaultConfig(2 * time.Minute)
+		bgConf.StatsEnabled = true
+		bigcacheClient, _ := bigcache.New(ctx, bgConf)
 		backend = bigcachestore.NewBigcache(bigcacheClient)
 	case constant.Redis:
 		redisClient, err := newRedisClient(ctx, &redis.Options{
-			Addr: config.Store.Url,
+			Addr:         config.Store.Url,
+			PoolSize:     100,
+			MinIdleConns: 5,
+			DialTimeout:  2 * time.Second,
+			ReadTimeout:  2 * time.Second,
+			WriteTimeout: 2 * time.Second,
 		})
 		if err != nil {
 			return nil, err

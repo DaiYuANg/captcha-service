@@ -1,17 +1,24 @@
 package image
 
 import (
-	"github.com/eko/gocache/lib/v4/cache"
+	"captcha-service/internal/model"
+	"captcha-service/internal/store"
 	"github.com/gofiber/fiber/v3"
+	"go.uber.org/fx"
 )
 
 type CaptchaController struct {
-	store *cache.Cache[[]byte]
+	store *store.Store[*model.ImageCaptchaModel]
 }
 
-func NewCaptchaController(store *cache.Cache[[]byte]) *CaptchaController {
+type NewCaptchaControllerParameter struct {
+	fx.In
+	Store *store.Store[*model.ImageCaptchaModel] `name:"image"`
+}
+
+func newCaptchaController(parameter NewCaptchaControllerParameter) *CaptchaController {
 	return &CaptchaController{
-		store: store,
+		store: parameter.Store,
 	}
 }
 
@@ -21,7 +28,7 @@ func (i *CaptchaController) RegisterRoute(app *fiber.App) {
 	verify := group.Group("verify")
 
 	generate.Get("/number", i.numberImage)
-	verify.Get("/number", i.verifyNumber)
+	verify.Post("/number", i.verifyNumber)
 
 	group.Get("/image/word", i.wordImage)
 	group.Get("/image/math", i.mathImage)

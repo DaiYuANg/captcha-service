@@ -29,6 +29,7 @@ func httpLifecycle(dep LifecycleDependency) {
 					fiber.ListenConfig{
 						EnablePrintRoutes: true,
 						ShutdownTimeout:   1000,
+						EnablePrefork:     cfg.Http.Prefork,
 					},
 				), "sproxy start fail")
 			}()

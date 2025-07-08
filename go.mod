@@ -18,7 +18,6 @@ require (
 	github.com/gofiber/contrib/fiberzap/v2 v2.1.6
 	github.com/gofiber/contrib/monitor v0.1.2
 	github.com/gofiber/fiber/v3 v3.0.0-beta.4
-	github.com/gofiber/template/html/v2 v2.1.3
 	github.com/golang-module/base64Captcha v1.3.9
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/joho/godotenv v1.5.1
@@ -129,8 +128,6 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gofiber/fiber/v2 v2.52.8 // indirect
 	github.com/gofiber/schema v1.5.0 // indirect
-	github.com/gofiber/template v1.8.3 // indirect
-	github.com/gofiber/utils v1.1.0 // indirect
 	github.com/gofiber/utils/v2 v2.0.0-beta.9 // indirect
 	github.com/gofrs/flock v0.12.1 // indirect
 	github.com/gohugoio/hugo v0.147.6 // indirect
