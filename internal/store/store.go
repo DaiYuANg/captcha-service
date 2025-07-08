@@ -1,15 +1,14 @@
 package store
 
 import (
-	"context"
 	"encoding/json"
-	"github.com/eko/gocache/lib/v4/cache"
+	"github.com/gofiber/fiber/v3"
 	"go.uber.org/zap"
+	"time"
 )
 
 type Store[T any] struct {
-	core   *cache.Cache[[]byte]
-	ctx    context.Context
+	core   fiber.Storage
 	logger *zap.SugaredLogger
 }
 
@@ -22,7 +21,7 @@ func (s *Store[T]) Set(key string, value T) error {
 		return err
 	}
 
-	err = s.core.Set(s.ctx, key, data)
+	err = s.core.Set(key, data, 2*time.Minute)
 	if err != nil {
 		s.logger.Errorf("Store.Set core.Set error key=%s err=%v", key, err)
 		return err
@@ -37,7 +36,7 @@ func (s *Store[T]) Get(key string) (T, error) {
 
 	var result T
 
-	data, err := s.core.Get(s.ctx, key)
+	data, err := s.core.Get(key)
 	if err != nil {
 		s.logger.Errorf("Store.Get core.Get error key=%s err=%v", key, err)
 		var nilVal T
@@ -57,7 +56,7 @@ func (s *Store[T]) Get(key string) (T, error) {
 func (s *Store[T]) Delete(key string) error {
 	s.logger.Infof("Store.Delete called key=%s", key)
 
-	err := s.core.Delete(s.ctx, key)
+	err := s.core.Delete(key)
 	if err != nil {
 		s.logger.Errorf("Store.Delete error key=%s err=%v", key, err)
 		return err

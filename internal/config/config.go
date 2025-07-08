@@ -26,15 +26,19 @@ func (h Http) GetPort() string {
 }
 
 type Store struct {
-	Type constant.StoreType `koanf:"type"`
-	Url  string             `koanf:"url"`
+	Type     constant.StoreType `koanf:"type"`
+	Url      string             `koanf:"url"`
+	Port     int                `koanf:"port"`
+	Username string             `koanf:"username"`
+	Password string             `koanf:"password"`
+	Database string             `koanf:"database"`
 }
 
 func defaultConfig() Config {
 	return Config{
 		Http: Http{
 			Port:    18080,
-			Prefork: true,
+			Prefork: false,
 		},
 		Store: Store{Type: constant.Memory},
 	}
