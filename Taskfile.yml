@@ -9,7 +9,7 @@ vars:
   DEFAULT_GOOS: linux
   DEFAULT_GOARCH: amd64
   DOCKERHUB_REPO: daiyuang/captcha-service
-  CONTAINER_PLATFORM: linux/amd64
+  CONTAINER_PLATFORM: linux/amd64,linux/arm64
 tasks:
   clean:
     cmds:
@@ -55,17 +55,6 @@ tasks:
       - mkdir -p {{.DIST_DIR}}/windows
       - go build -trimpath -ldflags="-s -w" -o {{.DIST_DIR}}/windows/{{.BIN_NAME}}.exe .
 
-  build:docker:distroless:
-    desc: 构建 Docker 镜像并推送到 DockerHub 和 GHCR（distroless）
-    cmds:
-      - |
-        docker buildx build \
-          --target distroless \
-          --platform {{.CONTAINER_PLATFORM}} \
-          -t {{.DOCKERHUB_REPO}}:distroless \
-          -t {{.DOCKERHUB_REPO}}:latest \
-          .
-
   build:docker:alpine:
     desc: 构建 Alpine 运行时镜像
     cmds:
@@ -74,6 +63,7 @@ tasks:
           --target alpine \
           --platform {{.CONTAINER_PLATFORM}} \
           -t {{.DOCKERHUB_REPO}}:alpine \
+          --push \
           .
 
   build:docker:debian:
@@ -84,21 +74,12 @@ tasks:
           --target debian \
           --platform {{.CONTAINER_PLATFORM}} \
           -t {{.DOCKERHUB_REPO}}:debian \
-          .
-
-  build:docker:scratch:
-    desc: 构建 Scratch 运行时镜像
-    cmds:
-      - |
-        docker buildx build \
-          --target scratch \
-          --platform {{.CONTAINER_PLATFORM}} \
-          -t {{.DOCKERHUB_REPO}}:scratch \
+          --push \
           .
 
   build:docker:
     desc: build container
-    deps: [ build:docker:scratch,build:docker:distroless,build:docker:alpine,build:docker:debian ]
+    deps: [ build:docker:alpine,build:docker:debian ]
 
   check:
     cmds:

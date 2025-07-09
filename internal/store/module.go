@@ -44,7 +44,6 @@ func newStoreCore(config *config.Config, logger *zap.SugaredLogger) fiber.Storag
 		constant.Badger: func() fiber.Storage {
 			return badger.New(badger.Config{
 				Database:   path.Join(temp, "captcha.badger"),
-				Reset:      true,
 				GCInterval: commonGCInterval,
 			})
 		},
@@ -57,7 +56,6 @@ func newStoreCore(config *config.Config, logger *zap.SugaredLogger) fiber.Storag
 			return sqlite3.New(sqlite3.Config{
 				Database:        path.Join(temp, "captcha.sqlite"),
 				Table:           "fiber_storage",
-				Reset:           true,
 				GCInterval:      commonGCInterval,
 				MaxOpenConns:    100,
 				MaxIdleConns:    100,
@@ -76,18 +74,16 @@ func newStoreCore(config *config.Config, logger *zap.SugaredLogger) fiber.Storag
 				InitAddress: []string{config.Store.Url},
 				Username:    "",
 				Password:    "",
-				Reset:       true,
 				TLSConfig:   nil,
 			})
 		},
 		constant.Redis: func() fiber.Storage {
 			return redis.New(redis.Config{
 				Host:      config.Store.Url,
-				Port:      6379,
-				Username:  "",
-				Password:  "",
+				Port:      config.Store.Port,
+				Username:  config.Store.Username,
+				Password:  config.Store.Password,
 				Database:  0,
-				Reset:     false,
 				TLSConfig: nil,
 				PoolSize:  10 * runtime.GOMAXPROCS(0),
 			})
@@ -96,7 +92,6 @@ func newStoreCore(config *config.Config, logger *zap.SugaredLogger) fiber.Storag
 			return postgres.New(postgres.Config{
 				ConnectionURI: config.Store.Url,
 				Table:         "fiber_storage",
-				Reset:         false,
 				GCInterval:    commonGCInterval,
 			})
 		},
@@ -106,7 +101,6 @@ func newStoreCore(config *config.Config, logger *zap.SugaredLogger) fiber.Storag
 				Port:       config.Store.Port,
 				Database:   config.Store.Database,
 				Table:      "captcha-" + time.Now().Format("20060102150405"), // 避免特殊字符
-				Reset:      true,
 				GCInterval: commonGCInterval,
 			})
 		},

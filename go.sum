@@ -356,6 +356,8 @@ github.com/gofiber/storage/valkey v0.1.1 h1:1FfJAhVTwE02bEa1a7ZUX26mU0hhVA4khrQ6
 github.com/gofiber/storage/valkey v0.1.1/go.mod h1:EDKzc2dhEm0VKXlQf1K77I8MbkOJ5CRD6iXDWJ+cod8=
 github.com/gofiber/utils/v2 v2.0.0-beta.9 h1:IMb2TpF2bb1spuB63GuiOZJXFfq9VJe98ofFJoy0EAY=
 github.com/gofiber/utils/v2 v2.0.0-beta.9/go.mod h1:XjKLrtxE77EyWzzWGWAepv3NLclRSZkAG+Y+GfPcKeQ=
+github.com/gofiber/utils/v2 v2.0.0-beta.10 h1:yDQgcBKTnZiZ4S0YY+hpTnf5iJYwVaFA2HsOgOesAyY=
+github.com/gofiber/utils/v2 v2.0.0-beta.10/go.mod h1:qEZ175nSOkl5xciHmqxwNDsWzwiB39gB8RgU1d3U4mQ=
 github.com/gofrs/flock v0.12.1 h1:MTLVXXHf8ekldpJk3AKicLij9MdwOWkZ+a/jHHZby9E=
 github.com/gofrs/flock v0.12.1/go.mod h1:9zxTsyu5xtJ9DK+1tFZyibEV7y3uwDxPPfbxeeHCoD0=
 github.com/gogo/protobuf v1.3.2 h1:Ov1cvc58UF3b5XjBnZv7+opcTcQFZebYjWzi34vdm4Q=

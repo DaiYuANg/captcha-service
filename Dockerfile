@@ -1,15 +1,28 @@
 # 构建阶段（使用 Go 官方 slim 版本）
-FROM golang:1.24-alpine AS builder
+FROM golang:bookworm AS builder
 
 # 启用 Go module，关闭 CGO
 ENV GO111MODULE=on \
     CGO_ENABLED=0
 
+USER root
+
 WORKDIR /app
 
-# 安装 Taskfile
-RUN apk add --no-cache curl upx && \
-    sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+ARG UPX_VERSION=5.0.1
+
+RUN apt update && apt install -y curl xz-utils ca-certificates dumb-init \
+    && ARCH=$(dpkg --print-architecture) && \
+    case "$ARCH" in \
+        amd64)   UPX_ARCH=amd64 ;; \
+        arm64)   UPX_ARCH=arm64 ;; \
+        *)       echo "Unsupported arch: $ARCH" && exit 1 ;; \
+    esac && \
+    curl -sSL "https://github.com/upx/upx/releases/download/v${UPX_VERSION}/upx-${UPX_VERSION}-${UPX_ARCH}_linux.tar.xz" \
+    | tar -xJ && mv upx-${UPX_VERSION}-${UPX_ARCH}_linux/upx /usr/local/bin/ \
+    && rm -rf upx-${UPX_VERSION}-${UPX_ARCH}_linux* \
+    && curl -sSfL https://taskfile.dev/install.sh | sh -s -- -d
+
 
 COPY . .
 
@@ -18,32 +31,34 @@ RUN ./bin/task build || go build -trimpath -ldflags="-s -w" -o dist/captcha-serv
 
 RUN upx --best --lzma dist/captcha-service
 
-FROM gcr.io/distroless/static:nonroot  AS distroless
-
-WORKDIR /app
-
-COPY --from=builder /app/dist/captcha-service /app/captcha-service
-
-USER nonroot:nonroot
-
-ENTRYPOINT ["/app/captcha-service"]
-
-FROM scratch AS scratch
-
-COPY --from=builder /app/dist/captcha-service /captcha-service
-
-ENTRYPOINT ["/captcha-service"]
-
 FROM alpine:latest AS alpine
 RUN adduser -D -g '' appuser
+
 WORKDIR /app
 COPY --from=builder /app/dist/captcha-service /app/captcha-service
+
+USER root
+
+RUN apk add --no-cache dumb-init
+
 USER appuser
-ENTRYPOINT ["/app/captcha-service"]
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+CMD ["sh", "-c", "/app/captcha-service"]
 
 FROM debian:stable-slim AS debian
+
 WORKDIR /app
+
+COPY --from=builder /usr/bin/dumb-init /usr/bin/dumb-init
+
 COPY --from=builder /app/dist/captcha-service /app/captcha-service
+
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+
 RUN chmod +x /app/captcha-service
-ENTRYPOINT ["/app/captcha-service"]
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+
+CMD ["sh", "-c", "/app/captcha-service"]
